@@ -1,0 +1,182 @@
+/* Global Styles */
+:root {
+  --primary-color: #0d6efd;
+  --secondary-color: #6c757d;
+  --success-color: #198754;
+  --danger-color: #dc3545;
+  --warning-color: #ffc107;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+main {
+  flex: 1;
+}
+
+/* Hero Section */
+.hero-section {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 100px 0;
+  margin-bottom: 50px;
+}
+
+/* Feature Cards */
+.feature-card {
+  background: #f8f9fa;
+  border-radius: 10px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.feature-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.feature-icon {
+  font-size: 3rem;
+  color: var(--primary-color);
+  margin-bottom: 1rem;
+}
+
+/* Post Cards */
+.hover-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hover-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Post Content */
+.post-content {
+  line-height: 1.8;
+  font-size: 1.1rem;
+  white-space: pre-wrap;
+}
+
+/* Comments */
+.comment {
+  background: #f8f9fa;
+  transition: background 0.2s ease;
+}
+
+.comment:hover {
+  background: #e9ecef;
+}
+
+.reply {
+  background: #fff;
+}
+
+.replies {
+  border-left: 3px solid var(--primary-color);
+}
+
+/* Forms */
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+/* Buttons */
+.btn {
+  transition: all 0.2s ease;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+}
+
+/* Alert Auto-dismiss */
+.alert {
+  animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Navbar */
+.navbar-brand {
+  font-weight: bold;
+  font-size: 1.5rem;
+}
+
+/* Footer */
+footer {
+  margin-top: auto;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .hero-section {
+    padding: 60px 0;
+  }
+
+  .hero-section h1 {
+    font-size: 2rem;
+  }
+
+  .feature-icon {
+    font-size: 2rem;
+  }
+}
+
+/* Loading Animation */
+.spinner-border {
+  width: 3rem;
+  height: 3rem;
+}
+
+/* Tags */
+.badge {
+  font-weight: 500;
+  padding: 0.4em 0.6em;
+}
+
+/* Card Shadows */
+.shadow {
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1) !important;
+}
+
+.shadow-sm {
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
+}
+
+/* Scroll Behavior */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
