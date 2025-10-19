@@ -6,7 +6,7 @@ Just a ejs,express backend blog app.
 
 ### 📸 Screenshots
 
-### Home Page
+### --------------------------------------------------------Home Page--------------------------------------------------------
 ![Home Page](assests/fullpage.png)
 
 ### All Posts
@@ -130,6 +130,7 @@ npm start
 ---
 
 **Made with ❤️ using Express + MongoDB + EJS**
+
 
 
 
