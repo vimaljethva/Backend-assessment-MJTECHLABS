@@ -1,8 +1,8 @@
-# Backend-assessment-MJTECHLABS
+# Backend-assessment-New-Feature-Added-MJTECHLABS
 Just a ejs,express backend blog app.
 
-### 📸 Watch Project Video here👇
---[🎬 Watch Demo on Google Drive](https://drive.google.com/file/d/1YINlMHVngSnAyhUf0uPAnm2JJ9hx7Mzu/view?usp=sharing)
+### 📸 Watch Updated Project Video here👇
+--[🎬 Watch Demo on Google Drive](https://drive.google.com/file/d/1AUFUzSMZvnWp5SQSEwsvnSpy7WHCT3o5/view?usp=sharing)
 
 ### 📸 Screenshots
 
@@ -99,10 +99,16 @@ http://localhost:3000
 * 📝 Create, edit, delete blog posts
 * 💬 Nested comments (2 levels deep)
 * 🏷️ Tag system for posts
+* 🖼️ Image upload for posts
 * 📄 Draft/Published status
 * 🗑️ Soft delete functionality
 * 🎨 Premium responsive UI
 * 🔒 Protected routes & authorization
+* 🔗SEO-friendly slug URLs (`/posts/my-first-post`)
+* 🔎 Search posts by title/content
+* 📄 Pagination (6 posts per page)
+* 🔃 Sort posts (Date, Title, Views)
+* 📊 View counter for posts
 
 ---
 
@@ -117,6 +123,7 @@ npm start
 ---
 
 **Made with ❤️ using Express + MongoDB + EJS**
+
 
 
 
