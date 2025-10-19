@@ -104,6 +104,15 @@ http://localhost:3000
 * 🗑️ Soft delete functionality
 * 🎨 Premium responsive UI
 * 🔒 Protected routes & authorization
+* ⭐new Advanced Features
+* 🖼️Post image uploads with preview
+* 🔗SEO-friendly slug URLs (e.g., `/posts/my-awesome-post`)
+* 👍👎Like/Dislike system for comments and replies
+* 🔎 Full-text search by title and content
+* 📄 Pagination system (6 posts per page with navigation)
+* 🔃 Multiple sort options (Newest, Oldest, Title, Most Viewed)
+* 📊 Post view counter(tracks popularity)
+* ✨ Recent posts showcase on homepage
 
 ---
 
@@ -118,6 +127,7 @@ npm start
 ---
 
 **Made with ❤️ using Express + MongoDB + EJS**
+
 
 
 
