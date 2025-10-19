@@ -15,6 +15,9 @@ Just a ejs,express backend blog app.
 ### Single Post with Comments
 ![Post View](assests/individualPost.png)
 
+### Search Feature
+![Post View](assests/searchFeature.png)
+
 ### Login Page
 ![Create](assests/login.png)
 
@@ -104,11 +107,15 @@ http://localhost:3000
 * 🗑️ Soft delete functionality
 * 🎨 Premium responsive UI
 * 🔒 Protected routes & authorization
-* 🔗SEO-friendly slug URLs (`/posts/my-first-post`)
-* 🔎 Search posts by title/content
-* 📄 Pagination (6 posts per page)
-* 🔃 Sort posts (Date, Title, Views)
-* 📊 View counter for posts
+* ⭐new Advanced Features
+* 🖼️Post image uploads with preview
+* 🔗SEO-friendly slug URLs (e.g., `/posts/my-awesome-post`)
+* 👍👎Like/Dislike system for comments and replies
+* 🔎 Full-text search by title and content
+* 📄 Pagination system (6 posts per page with navigation)
+* 🔃 Multiple sort options (Newest, Oldest, Title, Most Viewed)
+* 📊 Post view counter(tracks popularity)
+* ✨ Recent posts showcase on homepage
 
 ---
 

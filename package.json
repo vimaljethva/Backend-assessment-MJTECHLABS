@@ -7,13 +7,8 @@
     "start": "node app.js",
     "dev": "nodemon app.js"
   },
-  "keywords": [
-    "blog",
-    "express",
-    "mongodb",
-    "jwt"
-  ],
-  "author": "Your Name",
+  "keywords": ["blog", "express", "mongodb", "jwt"],
+  "author": "Vimal Jethva",
   "license": "ISC",
   "dependencies": {
     "bcryptjs": "^2.4.3",
