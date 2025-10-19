@@ -16,6 +16,9 @@ Just a ejs,express backend blog app.
 ### Single Post with Comments
 ![Post View](assests/individualPost.png)
 
+### Search Feature
+![Post View](assests/searchFeature.png)
+
 ### Login Page
 ![Create](assests/login.png)
 
@@ -127,6 +130,7 @@ npm start
 ---
 
 **Made with ❤️ using Express + MongoDB + EJS**
+
 
 
 
