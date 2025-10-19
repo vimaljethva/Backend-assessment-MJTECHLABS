@@ -126,11 +126,14 @@ http://localhost:3000
 npm install
 npm start
 # Visit http://localhost:3000
+
+if you skip .env file to make,u will get an mongoose.connect error,so make sure to create .env at app.js path
 ```
 
 ---
 
 **Made with ❤️ using Express + MongoDB + EJS**
+
 
 
 
