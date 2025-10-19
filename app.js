@@ -6,6 +6,9 @@ const session = require('express-session');
 const flash = require('connect-flash');
 const methodOverride = require('method-override');
 const mongoSanitize = require('express-mongo-sanitize');
+const Post = require('./models/Post');
+const wrapAsync = require('./middleware/wrapAsync');
+const { optionalAuth } = require('./middleware/auth');
 require('dotenv').config();
 
 // Import routes
@@ -59,10 +62,30 @@ app.use((req, res, next) => {
   next();
 });
 
-// Routes check test
-app.get('/', (req, res) => {
-  res.render('home');
-});
+
+// Routes
+app.get('/', optionalAuth, wrapAsync(async (req, res) => {
+  const search = req.query.search || '';
+  
+  let query = { isDeleted: false, status: 'published' };
+  
+  if (search) {
+    query.$text = { $search: search };
+  }
+  
+  const recentPosts = await Post.find(query)
+    .populate('author', 'username')
+    .sort({ createdAt: -1 })
+    .limit(6);
+  
+  res.render('home', { 
+    title: 'Home',
+    recentPosts,
+    search
+  });
+}));
+
+
 
 app.use('/auth', authRoutes);
 app.use('/posts', postRoutes);

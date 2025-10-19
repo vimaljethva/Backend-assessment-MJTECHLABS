@@ -870,3 +870,58 @@ html {
     border: 1px solid #ddd;
   }
 }
+
+/* Search Form */
+.search-form .input-group {
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  border-radius: var(--border-radius-lg);
+  overflow: hidden;
+}
+
+.search-form .form-control {
+  border: none;
+  padding: 1rem 1.5rem;
+  font-size: 1.1rem;
+}
+
+.search-form .btn {
+  padding: 1rem 1.5rem;
+  border: none;
+}
+
+/* Pagination */
+.pagination {
+  margin-top: 2rem;
+}
+
+.pagination .page-link {
+  color: var(--primary-color);
+  border-radius: var(--border-radius);
+  margin: 0 0.25rem;
+  border: 2px solid var(--light);
+}
+
+.pagination .page-item.active .page-link {
+  background: var(--gradient-primary);
+  border-color: var(--primary-color);
+}
+
+.pagination .page-link:hover {
+  background: var(--primary-light);
+  color: white;
+  border-color: var(--primary-color);
+}
+
+/* Post Image */
+.post-image img {
+  transition: var(--transition);
+}
+
+.post-image img:hover {
+  transform: scale(1.02);
+}
+
+/* Like/Dislike Buttons */
+.btn-sm i {
+  font-size: 0.9rem;
+}

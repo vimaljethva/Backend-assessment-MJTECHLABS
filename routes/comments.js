@@ -7,20 +7,19 @@ const wrapAsync = require('../middleware/wrapAsync');
 const ExpressError = require('../utils/ExpressError');
 const { commentSchema } = require('../utils/validation');
 
-// add comment to post
+// Add comment to post
 router.post('/', authenticate, wrapAsync(async (req, res) => {
   const { postId } = req.params;
 
-  // validate input checks
+  // Validate input
   const { error } = commentSchema.validate(req.body);
   if (error) {
     req.flash('error', error.details[0].message);
     return res.redirect(`/posts/${postId}`);
   }
 
-  // Check if post exists or not
+  // Check if post exists
   const post = await Post.findOne({ _id: postId, isDeleted: false, status: 'published' });
-   // console.log(post)
   if (!post) {
     req.flash('error', 'Post not found');
     return res.redirect('/posts');
@@ -37,32 +36,32 @@ router.post('/', authenticate, wrapAsync(async (req, res) => {
 
   await comment.save();
   req.flash('success', 'Comment added successfully!');
-  res.redirect(`/posts/${postId}`);
+  res.redirect(`/posts/${post.slug}`);
 }));
 
-// Reply to a comment with auth middleware
+// Reply to a comment
 router.post('/:commentId/reply', authenticate, wrapAsync(async (req, res) => {
   const { postId, commentId } = req.params;
 
-  // will validate input and check if err
+  // Validate input
   const { error } = commentSchema.validate(req.body);
   if (error) {
     req.flash('error', error.details[0].message);
     return res.redirect(`/posts/${postId}`);
   }
 
-  // check if parent comment exists or its parent comment
+  const post = await Post.findById(postId);
   const parentComment = await Comment.findOne({ _id: commentId, isDeleted: false });
+  
   if (!parentComment) {
     req.flash('error', 'Comment not found');
-    return res.redirect(`/posts/${postId}`);
+    return res.redirect(`/posts/${post.slug}`);
   }
-   // console.log(parentComment)
 
-  // check nesting level (max 2 levels: 0 and 1)
+  // Check nesting level
   if (parentComment.level >= 1) {
     req.flash('error', 'Cannot reply to this comment (max nesting level reached)');
-    return res.redirect(`/posts/${postId}`);
+    return res.redirect(`/posts/${post.slug}`);
   }
 
   const { content } = req.body;
@@ -77,31 +76,93 @@ router.post('/:commentId/reply', authenticate, wrapAsync(async (req, res) => {
 
   await reply.save();
   req.flash('success', 'Reply added successfully!');
-  res.redirect(`/posts/${postId}`);
+  res.redirect(`/posts/${post.slug}`);
 }));
 
-// delete comment (soft delete)
-router.delete('/:commentId', authenticate, wrapAsync(async (req, res) => {
+// Like comment
+router.post('/:commentId/like', authenticate, wrapAsync(async (req, res) => {
   const { postId, commentId } = req.params;
-
-  const comment = await Comment.findOne({ _id: commentId, isDeleted: false });
+  const comment = await Comment.findById(commentId);
+  const post = await Post.findById(postId);
 
   if (!comment) {
     req.flash('error', 'Comment not found');
-    return res.redirect(`/posts/${postId}`);
+    return res.redirect(`/posts/${post.slug}`);
   }
 
-  // check if user is the author
+  const userIdStr = req.user._id.toString();
+  const likeIndex = comment.likes.findIndex(id => id.toString() === userIdStr);
+  const dislikeIndex = comment.dislikes.findIndex(id => id.toString() === userIdStr);
+
+  // Remove from dislikes if present
+  if (dislikeIndex > -1) {
+    comment.dislikes.splice(dislikeIndex, 1);
+  }
+
+  // Toggle like
+  if (likeIndex > -1) {
+    comment.likes.splice(likeIndex, 1);  // Unlike
+  } else {
+    comment.likes.push(req.user._id);    // Like
+  }
+
+  await comment.save();
+  res.redirect(`/posts/${post.slug}`);
+}));
+
+// Dislike comment
+router.post('/:commentId/dislike', authenticate, wrapAsync(async (req, res) => {
+  const { postId, commentId } = req.params;
+  const comment = await Comment.findById(commentId);
+  const post = await Post.findById(postId);
+
+  if (!comment) {
+    req.flash('error', 'Comment not found');
+    return res.redirect(`/posts/${post.slug}`);
+  }
+
+  const userIdStr = req.user._id.toString();
+  const likeIndex = comment.likes.findIndex(id => id.toString() === userIdStr);
+  const dislikeIndex = comment.dislikes.findIndex(id => id.toString() === userIdStr);
+
+  // Remove from likes if present
+  if (likeIndex > -1) {
+    comment.likes.splice(likeIndex, 1);
+  }
+
+  // Toggle dislike
+  if (dislikeIndex > -1) {
+    comment.dislikes.splice(dislikeIndex, 1);  // Remove dislike
+  } else {
+    comment.dislikes.push(req.user._id);       // Dislike
+  }
+
+  await comment.save();
+  res.redirect(`/posts/${post.slug}`);
+}));
+
+// Delete comment (soft delete)
+router.delete('/:commentId', authenticate, wrapAsync(async (req, res) => {
+  const { postId, commentId } = req.params;
+  const comment = await Comment.findOne({ _id: commentId, isDeleted: false });
+  const post = await Post.findById(postId);
+
+  if (!comment) {
+    req.flash('error', 'Comment not found');
+    return res.redirect(`/posts/${post.slug}`);
+  }
+
+  // Check if user is the author
   if (!comment.author.equals(req.user._id)) {
     req.flash('error', 'You do not have permission to delete this comment');
-    return res.redirect(`/posts/${postId}`);
+    return res.redirect(`/posts/${post.slug}`);
   }
 
   comment.isDeleted = true;
   await comment.save();
 
   req.flash('success', 'Comment deleted successfully');
-  res.redirect(`/posts/${postId}`);
+  res.redirect(`/posts/${post.slug}`);
 }));
 
 module.exports = router;
