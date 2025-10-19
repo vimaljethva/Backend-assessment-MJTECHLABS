@@ -55,7 +55,7 @@ Follow these steps to get the project up and running on your local machine.
 
 **1. Clone the repository:**
 ```bash
-git clone https://github.com/yourusername/blog-platform.git
+git clone https://github.com/vimaljethva/Backend-assessment-MJTECHLABS.git
 ```
 
 **2. Navigate to the project directory:**
@@ -133,6 +133,7 @@ if you skip .env file to make,u will get an mongoose.connect error,so make sure 
 ---
 
 **Made with ❤️ using Express + MongoDB + EJS**
+
 
 
 
