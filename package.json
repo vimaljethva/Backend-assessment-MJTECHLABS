@@ -8,7 +8,7 @@
     "dev": "nodemon app.js"
   },
   "keywords": ["blog", "express", "mongodb", "jwt"],
-  "author": "Your Name",
+  "author": "Vimal Jethva",
   "license": "ISC",
   "dependencies": {
     "express": "^4.18.2",
