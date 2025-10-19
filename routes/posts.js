@@ -6,35 +6,70 @@ const { authenticate, optionalAuth } = require('../middleware/auth');
 const wrapAsync = require('../middleware/wrapAsync');
 const ExpressError = require('../utils/ExpressError');
 const { postSchema } = require('../utils/validation');
+const upload = require('../config/multer');
+const fs = require('fs');
+const path = require('path');
 
-// show all published posts
+// Get all published posts with pagination, sorting, and search
 router.get('/', optionalAuth, wrapAsync(async (req, res) => {
-  const posts = await Post.find({ isDeleted: false, status: 'published' })
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 6;
+  const sort = req.query.sort || '-createdAt';
+  const search = req.query.search || '';
+
+  const skip = (page - 1) * limit;
+
+  // Build query
+  let query = { isDeleted: false, status: 'published' };
+
+  // Add search if provided
+  if (search) {
+    query.$text = { $search: search };
+  }
+
+  // Get total count
+  const total = await Post.countDocuments(query);
+
+  // Get posts
+  const posts = await Post.find(query)
     .populate('author', 'username')
-    .sort({ createdAt: -1 });//-1 so descending so new post will appear first
-    // console.log(posts)
-    
-  
-  res.render('posts/index', { posts, title: 'All Posts' });
+    .sort(sort)
+    .skip(skip)
+    .limit(limit);
+
+  const totalPages = Math.ceil(total / limit);
+
+  res.render('posts/index', { 
+    posts, 
+    title: 'All Posts',
+    currentPage: page,
+    totalPages,
+    sort,
+    search
+  });
 }));
 
-// show new post form
+// Render new post form
 router.get('/new', authenticate, (req, res) => {
   res.render('posts/new', { title: 'Create New Post' });
 });
 
-// Create new post
-router.post('/', authenticate, wrapAsync(async (req, res) => {
-  // Validate input is right or nto
+// Create new post with image upload
+router.post('/', authenticate, upload.single('image'), wrapAsync(async (req, res) => {
+  // Validate input
   const { error } = postSchema.validate(req.body);
   if (error) {
+    // Delete uploaded file if validation fails
+    if (req.file) {
+      fs.unlinkSync(req.file.path);
+    }
     req.flash('error', error.details[0].message);
     return res.redirect('/posts/new');
   }
 
   const { title, content, tags, status } = req.body;
   
-  // tags process of add like comma comma will separate the tags
+  // Process tags
   const tagArray = tags ? tags.split(',').map(tag => tag.trim()).filter(tag => tag) : [];
 
   const post = new Post({
@@ -42,21 +77,19 @@ router.post('/', authenticate, wrapAsync(async (req, res) => {
     content,
     tags: tagArray,
     status,
-    author: req.user._id
+    author: req.user._id,
+    image: req.file ? `/uploads/${req.file.filename}` : null
   });
-
 
   await post.save();
   req.flash('success', 'Post created successfully!');
-  res.redirect(`/posts/${post._id}`);
+  res.redirect(`/posts/${post.slug}`);
 }));
 
-// show single post
-router.get('/:id', optionalAuth, wrapAsync(async (req, res) => {
-
-  const post = await Post.findOne({ _id: req.params.id, isDeleted: false })
+// Get single post by slug
+router.get('/:slug', optionalAuth, wrapAsync(async (req, res) => {
+  const post = await Post.findOne({ slug: req.params.slug, isDeleted: false })
     .populate('author', 'username');
-     // console.log(post)
 
   if (!post) {
     req.flash('error', 'Post not found');
@@ -69,34 +102,39 @@ router.get('/:id', optionalAuth, wrapAsync(async (req, res) => {
     return res.redirect('/posts');
   }
 
-  // show comments for this post
+  // Increment views
+  post.views += 1;
+  await post.save();
+
+  // Get comments for this post
   const comments = await Comment.find({ 
-    post: req.params.id, 
+    post: post._id, 
     isDeleted: false,
     parentComment: null 
   })
     .populate('author', 'username')
+    .populate('likes', 'username')
+    .populate('dislikes', 'username')
     .sort({ createdAt: -1 });
 
-    // console.log(comments);
-
-  // show replies for each comment
+  // Get replies for each comment
   for (let comment of comments) {
     comment.replies = await Comment.find({
       parentComment: comment._id,
       isDeleted: false
     })
       .populate('author', 'username')
+      .populate('likes', 'username')
+      .populate('dislikes', 'username')
       .sort({ createdAt: 1 });
   }
 
   res.render('posts/show', { post, comments, title: post.title });
 }));
 
-// show edit post form
-router.get('/:id/edit', authenticate, wrapAsync(async (req, res) => {
-  const post = await Post.findOne({ _id: req.params.id, isDeleted: false });
-   // console.log(post)
+// Render edit post form
+router.get('/:slug/edit', authenticate, wrapAsync(async (req, res) => {
+  const post = await Post.findOne({ slug: req.params.slug, isDeleted: false });
 
   if (!post) {
     req.flash('error', 'Post not found');
@@ -106,33 +144,35 @@ router.get('/:id/edit', authenticate, wrapAsync(async (req, res) => {
   // Check if user is the author
   if (!post.author.equals(req.user._id)) {
     req.flash('error', 'You do not have permission to edit this post');
-    return res.redirect(`/posts/${post._id}`);
+    return res.redirect(`/posts/${post.slug}`);
   }
 
   res.render('posts/edit', { post, title: 'Edit Post' });
 }));
 
-// backend Update post
-router.put('/:id', authenticate, wrapAsync(async (req, res) => {
-  const post = await Post.findOne({ _id: req.params.id, isDeleted: false });
-   // console.log(post)
+// Update post
+router.put('/:slug', authenticate, upload.single('image'), wrapAsync(async (req, res) => {
+  const post = await Post.findOne({ slug: req.params.slug, isDeleted: false });
 
   if (!post) {
+    if (req.file) fs.unlinkSync(req.file.path);
     req.flash('error', 'Post not found');
     return res.redirect('/posts');
   }
 
   // Check if user is the author
   if (!post.author.equals(req.user._id)) {
+    if (req.file) fs.unlinkSync(req.file.path);
     req.flash('error', 'You do not have permission to update this post');
-    return res.redirect(`/posts/${post._id}`);
+    return res.redirect(`/posts/${post.slug}`);
   }
 
   // Validate input
   const { error } = postSchema.validate(req.body);
   if (error) {
+    if (req.file) fs.unlinkSync(req.file.path);
     req.flash('error', error.details[0].message);
-    return res.redirect(`/posts/${post._id}/edit`);
+    return res.redirect(`/posts/${post.slug}/edit`);
   }
 
   const { title, content, tags, status } = req.body;
@@ -142,16 +182,27 @@ router.put('/:id', authenticate, wrapAsync(async (req, res) => {
   post.content = content;
   post.tags = tagArray;
   post.status = status;
+
+  // Update image if new one uploaded
+  if (req.file) {
+    // Delete old image
+    if (post.image) {
+      const oldImagePath = path.join(__dirname, '..', 'public', post.image);
+      if (fs.existsSync(oldImagePath)) {
+        fs.unlinkSync(oldImagePath);
+      }
+    }
+    post.image = `/uploads/${req.file.filename}`;
+  }
   
   await post.save();
   req.flash('success', 'Post updated successfully!');
-  res.redirect(`/posts/${post._id}`);
+  res.redirect(`/posts/${post.slug}`);
 }));
 
 // Delete post (soft delete)
-router.delete('/:id', authenticate, wrapAsync(async (req, res) => {
-  const post = await Post.findOne({ _id: req.params.id, isDeleted: false });
-   // console.log(post)
+router.delete('/:slug', authenticate, wrapAsync(async (req, res) => {
+  const post = await Post.findOne({ slug: req.params.slug, isDeleted: false });
 
   if (!post) {
     req.flash('error', 'Post not found');
@@ -161,7 +212,7 @@ router.delete('/:id', authenticate, wrapAsync(async (req, res) => {
   // Check if user is the author
   if (!post.author.equals(req.user._id)) {
     req.flash('error', 'You do not have permission to delete this post');
-    return res.redirect(`/posts/${post._id}`);
+    return res.redirect(`/posts/${post.slug}`);
   }
 
   post.isDeleted = true;

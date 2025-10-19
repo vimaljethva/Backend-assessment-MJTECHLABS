@@ -25,8 +25,16 @@ const commentSchema = new mongoose.Schema({
   level: {
     type: Number,
     default: 0,
-    max: 1 // 0 = top level, 1 = reply (max 2 levels)
+    max: 1
   },
+  likes: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  }],
+  dislikes: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  }],
   isDeleted: {
     type: Boolean,
     default: false

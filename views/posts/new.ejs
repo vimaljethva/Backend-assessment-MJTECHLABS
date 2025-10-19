@@ -18,10 +18,16 @@
         <div class="card shadow">
           <div class="card-body p-4">
             <h2 class="mb-4">Create New Post</h2>
-            <form action="/posts" method="POST">
+            <form action="/posts" method="POST" enctype="multipart/form-data">
               <div class="mb-3">
                 <label for="title" class="form-label">Title</label>
                 <input type="text" class="form-control" id="title" name="title" required maxlength="200">
+              </div>
+
+              <div class="mb-3">
+                <label for="image" class="form-label">Post Image (Optional)</label>
+                <input type="file" class="form-control" id="image" name="image" accept="image/*">
+                <small class="text-muted">Max 5MB. Formats: JPG, PNG, GIF, WEBP</small>
               </div>
 
               <div class="mb-3">
@@ -31,7 +37,7 @@
 
               <div class="mb-3">
                 <label for="tags" class="form-label">Tags (comma separated)</label>
-                <input type="text" class="form-control" id="tags" name="tags" placeholder="e.g., technology, programming, tutorial">
+                <input type="text" class="form-control" id="tags" name="tags" placeholder="e.g., City,travel">
                 <small class="form-text text-muted">Separate tags with commas</small>
               </div>
 

@@ -18,10 +18,22 @@
         <div class="card shadow">
           <div class="card-body p-4">
             <h2 class="mb-4">Edit Post</h2>
-            <form action="/posts/<%= post._id %>?_method=PUT" method="POST">
+            <form action="/posts/<%= post.slug %>?_method=PUT" method="POST" enctype="multipart/form-data">
               <div class="mb-3">
                 <label for="title" class="form-label">Title</label>
                 <input type="text" class="form-control" id="title" name="title" value="<%= post.title %>" required maxlength="200">
+              </div>
+
+              <div class="mb-3">
+                <label for="image" class="form-label">Post Image</label>
+                <% if (post.image) { %>
+                  <div class="mb-2">
+                    <img src="<%= post.image %>" alt="Current image" class="img-thumbnail" style="max-height: 200px;">
+                    <p class="text-muted small">Current image (upload new to replace)</p>
+                  </div>
+                <% } %>
+                <input type="file" class="form-control" id="image" name="image" accept="image/*">
+                <small class="text-muted">Max 5MB. Formats: JPG, PNG, GIF, WEBP</small>
               </div>
 
               <div class="mb-3">
@@ -31,7 +43,7 @@
 
               <div class="mb-3">
                 <label for="tags" class="form-label">Tags (comma separated)</label>
-                <input type="text" class="form-control" id="tags" name="tags" value="<%= post.tags.join(', ') %>" placeholder="e.g., technology, programming, tutorial">
+                <input type="text" class="form-control" id="tags" name="tags" value="<%= post.tags.join(', ') %>" placeholder="e.g., City,travel">
                 <small class="form-text text-muted">Separate tags with commas</small>
               </div>
 
@@ -45,7 +57,7 @@
 
               <div class="d-flex gap-2">
                 <button type="submit" class="btn btn-primary">Update Post</button>
-                <a href="/posts/<%= post._id %>" class="btn btn-secondary">Cancel</a>
+                <a href="/posts/<%= post.slug %>" class="btn btn-secondary">Cancel</a>
               </div>
             </form>
           </div>
